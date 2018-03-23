@@ -15,6 +15,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by 허씨네 on 2018-03-19.
@@ -26,9 +28,32 @@ public class MessageReader {
     private ContentResolver contentResolver;
     private Cursor cursor;
 
+    private MessageDatabase db;
+
     public MessageReader(Context context) {
         mContext = context;
         contentResolver = mContext.getContentResolver();
+        db = new MessageDatabase(context);
+    }
+
+    public int getALLmsg_cnt() {
+        List<Message> msg_list = db.getAllMessage();
+        return msg_list.size();
+    }
+
+    public List<String> getALLmsg() {
+        List<Message> msg_list = db.getAllMessage();
+        List<String> msg_string_list = new ArrayList<String>();
+
+        if (msg_list.isEmpty()) {
+            msg_string_list.add("msg is empty");
+        }
+
+        for (int i = 0; i < msg_list.size(); i++) {
+            msg_string_list.add(msg_list.get(i).toString());
+        }
+
+        return msg_string_list;
     }
 
     public void parse_mms(Message msg) {
@@ -41,10 +66,10 @@ public class MessageReader {
             String type = cursor_mms.getString(cursor_mms.getColumnIndex("ct"));
             if ("text/plain".equals(type)) {
                 //msg.setBody(msg.getBody() + c.getString(c.getColumnIndex("text")));
-                Log.d("SMS_TEST", msg.getBody() + cursor_mms.getString(cursor_mms.getColumnIndex("text")));
+                //Log.d("SMS_TEST", msg.getBody() + cursor_mms.getString(cursor_mms.getColumnIndex("text")));
             } else  {//if (type.contains("image")) {
                 //msg.setImg(getMmsImg(pid));
-                Log.d("SMS_TEST", "NOT TEXT : " + type);
+                //Log.d("SMS_TEST", "NOT TEXT : " + type);
             }
 
 
@@ -88,7 +113,7 @@ public class MessageReader {
 //                    msgData += " " + cursor.getColumnName(idx) + ":" + cursor.getString(idx);
 //                }
                 // use msgData
-                if (cnt < 30) {
+                if (cnt < 100) {
                     Message msg = new Message(cursor.getString(cursor.getColumnIndex("_id")));
                     msg.setDate(cursor.getString(cursor.getColumnIndex("date")));
                     msg.setAddr(cursor.getString(cursor.getColumnIndex("Address")));
@@ -96,10 +121,15 @@ public class MessageReader {
                     msg.setDirection(cursor.getString(cursor.getColumnIndex("type")));
                     msg.setContact(cursor.getString(cursor.getColumnIndex("person")));
 
-                    Log.d("SMS_TEST", msg.toString());
+                    db.add_message(msg);
+                    //Log.d("SMS_TEST", msg.toString());
 
-                    cnt++;
+//                    for (int i = 0; i < cursor.getColumnCount(); i++) {
+//                        Log.d("SMS_TEST", cursor.getColumnName(i) + " : " + cursor.getString(i));
+//                    }
                 }
+
+                cnt++;
             } while (cursor.moveToNext());
         } else {
             // empty box, no SMS
@@ -121,7 +151,7 @@ public class MessageReader {
 
                     parse_mms(msg);
 
-                    Log.d("SMS_TEST", msg.toString());
+                    //Log.d("SMS_TEST", msg.toString());
 
                     cnt++;
                 }

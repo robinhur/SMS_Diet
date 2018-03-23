@@ -1,6 +1,7 @@
 package com.example.huza.prototype_sms_diet;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -23,6 +24,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,6 +72,15 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
         mReader = new MessageReader(this);
+        Log.d("SMS_TEST", "onCreate");
+        Log.d("SMS_TEST", String.valueOf(mViewPager.getChildCount()));
+        //lv = mViewPager.getChildAt(1).findViewById(R.id.msg_listview);
+        //adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, mReader.getALLmsg());
+//
+        //Log.d("SMS_TEST", lv.toString());
+//        Log.d("SMS_TEST", mReader.getALLmsg().toString());
+//
+//        lv.setAdapter(adapter);
     }
 
 
@@ -104,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         private static final String ARG_SECTION_NUMBER = "section_number";
 
         public PlaceholderFragment() {
+            Log.d("SMS_TEST", "PlaceholderFragment");
         }
 
         /**
@@ -115,26 +129,73 @@ public class MainActivity extends AppCompatActivity {
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
+            Log.d("SMS_TEST", "newInstance");
             return fragment;
+        }
+
+
+        View rootView = null;
+
+        ListView lv;
+        ArrayAdapter adapter;
+        MessageReader mReader;
+
+        Button btn;
+
+        public void init() {
+            if (mReader == null) {
+                mReader = new MessageReader(getContext());
+                //if (adapter == null) {
+                //    adapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, mReader.getALLmsg());
+                //}
+            }
+
+            Log.d("SMS_TEST", String.valueOf(mReader.getALLmsg_cnt()));
+
+        }
+
+        public void read_message() {
+            init();
+
+            mReader.read_message();
+            adapter.notifyDataSetChanged();
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
-            View rootView = null;
 
             switch (getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 1:
                     rootView = inflater.inflate(R.layout.fragment_main_tab1, container, false);
+                    init();
+                    btn = rootView.findViewById(R.id.btn_sms);
+                    btn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
+                                ActivityCompat.requestPermissions((Activity) getContext(), new String[]{Manifest.permission.READ_SMS}, 100);
+                            }
+
+                            read_message();
+                        }
+                    });
+                    Log.d("SMS_TEST", "onCreateView1");
                     break;
                 case 2:
                     rootView = inflater.inflate(R.layout.fragment_main_tab2, container, false);
+                    init();
+                    lv = rootView.findViewById(R.id.msg_listview);
+                    adapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, mReader.getALLmsg());
+                    lv.setAdapter(adapter);
+                    Log.d("SMS_TEST", "onCreateView2");
                     break;
                 case 3:
                     rootView = inflater.inflate(R.layout.fragment_main_dummy, container, false);
                     TextView textView = (TextView) rootView.findViewById(R.id.section_label);
                     textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+                    Log.d("SMS_TEST", "onCreateView3");
                     break;
             }
 
@@ -173,4 +234,6 @@ public class MainActivity extends AppCompatActivity {
 
         mReader.read_message();
     }
+
+
 }

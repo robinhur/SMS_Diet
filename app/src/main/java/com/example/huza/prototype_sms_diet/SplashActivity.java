@@ -28,20 +28,21 @@ public class SplashActivity extends AppCompatActivity {
 
         ImageView iv = findViewById(R.id.splash_logo);
         final TextView tv = findViewById(R.id.splash_HuZA);
-        tv.setVisibility(View.INVISIBLE);
+        tv.setVisibility(View.GONE);
 
         int iv_width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
         int iv_height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
 
-        ConstraintLayout.LayoutParams iv_lp = new ConstraintLayout.LayoutParams(iv_width, iv_height);
-        iv_lp.topToTop = R.id.splash_container;
-        iv_lp.bottomToBottom = R.id.splash_container;
-        iv_lp.leftToLeft = R.id.splash_container;
-        iv_lp.rightToRight = R.id.splash_container;
-
-        iv_lp.setMargins(0, 0, 0, statusbar_height);
-
-        iv.setLayoutParams(iv_lp);
+//        ConstraintLayout.LayoutParams iv_lp = new ConstraintLayout.LayoutParams(iv_width, iv_height);
+//        iv_lp.topToTop = R.id.splash_container;
+//        iv_lp.bottomToBottom = R.id.splash_container;
+//        iv_lp.leftToLeft = R.id.splash_container;
+//        iv_lp.rightToRight = R.id.splash_container;
+//
+//        //iv_lp.setMargins(0, 0, 0, statusbar_height*5);
+//        /iv_lp.setMargins(0, 0, 0, statusbar_height);
+//
+//        iv.setLayoutParams(iv_lp);
 
 
         // ANIMATION START
